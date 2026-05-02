@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: kanban
+
+  datasource:
+    url: ${DB_URL:jdbc:oracle:thin:@localhost:1521/XEPDB1}
+    username: ${DB_USERNAME:kanban}
+    password: ${DB_PASSWORD:kanban1234}
+    driver-class-name: oracle.jdbc.OracleDriver
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.woo.kanban.domain
+  configuration:
+    map-underscore-to-camel-case: true
