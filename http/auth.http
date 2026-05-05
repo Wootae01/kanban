@@ -1,0 +1,21 @@
+### 회원가입
+POST http://localhost:8080/auth/signup
+Content-Type: application/json
+
+{
+  "email": "test@test.com",
+  "password": "test1234",
+  "confirmPassword": "test1234",
+  "name": "테스터"
+}
+
+
+### 로그인
+POST http://localhost:8080/auth/login
+Content-Type: application/x-www-form-urlencoded
+
+email=test@test.com&password=test1234
+
+### 로그아웃
+POST http://localhost:8080/auth/logout
+

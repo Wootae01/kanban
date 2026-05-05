@@ -8,6 +8,11 @@ spring:
     password: ${DB_PASSWORD:kanban1234}
     driver-class-name: oracle.jdbc.OracleDriver
 
+  session:
+    data:
+      redis:
+        repository-type: indexed
+        namespace: kanban:session
   data:
     redis:
       host: ${REDIS_HOST:localhost}
@@ -15,6 +20,6 @@ spring:
 
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml
-  type-aliases-package: com.woo.kanban.domain
+  type-aliases-package: com.woo.kanban.app
   configuration:
     map-underscore-to-camel-case: true
