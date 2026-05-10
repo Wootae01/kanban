@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.woo.kanban.app.workspace.mapper.WorkspaceMapper">
+
+    <resultMap id="workspaceResponseMap" type="WorkspaceResponse">
+        <constructor>
+            <idArg column="id" javaType="Long"/>
+            <arg column="name" javaType="String"/>
+            <arg column="member_count" javaType="Integer"/>
+            <arg column="task_count" javaType="Integer"/>
+        </constructor>
+    </resultMap>
+
+    <insert id="insert" parameterType="Workspace">
+        <selectKey keyProperty="id" resultType="Long" order="BEFORE">
+            SELECT workspace_seq.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO Workspace (id, name, created_by, created_at)
+        VALUES (#{id}, #{name}, #{createdBy}, SYSDATE)
+    </insert>
+
+    <select id="findWorkspacesByUserId" parameterType="Long" resultMap="workspaceResponseMap">
+        SELECT w.id, w.name,
+               COUNT(DISTINCT wm.id) AS member_count,
+               COUNT(DISTINCT t.id) AS task_count
+        FROM WORKSPACE w
+        JOIN WORKSPACE_MEMBER wm ON w.ID = wm.WORKSPACE_ID
+        LEFT JOIN TASK t ON w.id = t.WORKSPACE_ID
+        WHERE wm.USER_ID = #{userId}
+        GROUP BY w.ID, w.NAME
+    </select>
+
+    <select id="findById" parameterType="Long" resultType="Workspace">
+        SELECT id, name, created_by, created_at FROM WORKSPACE WHERE ID = #{id}
+    </select>
+
+    <update id="update">
+        UPDATE WORKSPACE SET NAME = #{name} WHERE ID = #{id}
+    </update>
+
+    <delete id="delete" parameterType="Long">
+        DELETE FROM WORKSPACE WHERE ID = #{id}
+    </delete>
+
+</mapper>

@@ -4,8 +4,8 @@ Content-Type: application/json
 
 {
   "email": "test@test.com",
-  "password": "test1234",
-  "confirmPassword": "test1234",
+  "password": "test1234!",
+  "confirmPassword": "test1234!",
   "name": "테스터"
 }
 
@@ -14,7 +14,7 @@ Content-Type: application/json
 POST http://localhost:8080/auth/login
 Content-Type: application/x-www-form-urlencoded
 
-email=test@test.com&password=test1234
+email=test@test.com&password=test1234!
 
 ### 로그아웃
 POST http://localhost:8080/auth/logout

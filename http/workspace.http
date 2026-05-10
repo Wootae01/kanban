@@ -1,0 +1,24 @@
+### workspace 생성
+POST http://localhost:8080/workspaces
+Content-Type: application/json
+
+{
+  "name": "테스트 워크스페이스"
+}
+
+### 내 workspace 목록 조회
+GET http://localhost:8080/workspaces
+
+### workspace 상세 조회
+GET http://localhost:8080/workspaces/1
+
+### workspace 수정
+PUT http://localhost:8080/workspaces/1
+Content-Type: application/json
+
+{
+  "name": "수정된 워크스페이스"
+}
+
+### workspace 삭제
+DELETE http://localhost:8080/workspaces/1
