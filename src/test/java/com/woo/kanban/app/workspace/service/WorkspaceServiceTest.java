@@ -38,6 +38,9 @@ class WorkspaceServiceTest {
     @Mock
     WorkspaceMemberMapper workspaceMemberMapper;
 
+    @Mock
+    WorkspacePermissionChecker permissionChecker;
+
     @Test
     @DisplayName("workspace_생성")
     public void createWorkspace() {
@@ -121,9 +124,7 @@ class WorkspaceServiceTest {
     void updateSuccess() {
         // given
         WorkspaceUpdateRequest request = new WorkspaceUpdateRequest("newName");
-
         when(workspaceMapper.findById(WorkspaceFixture.ID)).thenReturn(Optional.of(WorkspaceFixture.workspace()));
-        when(workspaceMemberMapper.findByIdAndUserId(WorkspaceFixture.ID, WorkspaceFixture.USER_ID)).thenReturn(Optional.of(WorkspaceFixture.adminMember()));
 
         // when
         workspaceService.update(WorkspaceFixture.ID, WorkspaceFixture.USER_ID, request);
@@ -135,12 +136,11 @@ class WorkspaceServiceTest {
     @Test
     @DisplayName("workspace_수정_실패_권한없음")
     void updateFailNotAdmin() {
-
         // given
         WorkspaceUpdateRequest request = new WorkspaceUpdateRequest("testName");
-
         when(workspaceMapper.findById(WorkspaceFixture.ID)).thenReturn(Optional.of(WorkspaceFixture.workspace()));
-        when(workspaceMemberMapper.findByIdAndUserId(WorkspaceFixture.ID, WorkspaceFixture.USER_ID)).thenReturn(Optional.of(WorkspaceFixture.nonAdminMember()));
+        doThrow(new AccessDeniedException("관리자만 가능합니다."))
+                .when(permissionChecker).checkAdmin(WorkspaceFixture.ID, WorkspaceFixture.USER_ID);
 
         // when & then
         assertThatThrownBy(() -> workspaceService.update(WorkspaceFixture.ID, WorkspaceFixture.USER_ID, request))
@@ -150,12 +150,11 @@ class WorkspaceServiceTest {
     @Test
     @DisplayName("workspace_수정_실패_멤버아님")
     void updateFailNotMember() {
-
         // given
         WorkspaceUpdateRequest request = new WorkspaceUpdateRequest("testName");
-
         when(workspaceMapper.findById(WorkspaceFixture.ID)).thenReturn(Optional.of(WorkspaceFixture.workspace()));
-        when(workspaceMemberMapper.findByIdAndUserId(WorkspaceFixture.ID, WorkspaceFixture.USER_ID)).thenReturn(Optional.empty());
+        doThrow(new AccessDeniedException("워크스페이스 멤버가 아닙니다."))
+                .when(permissionChecker).checkAdmin(WorkspaceFixture.ID, WorkspaceFixture.USER_ID);
 
         // when & then
         assertThatThrownBy(() -> workspaceService.update(WorkspaceFixture.ID, WorkspaceFixture.USER_ID, request))
@@ -165,10 +164,8 @@ class WorkspaceServiceTest {
     @Test
     @DisplayName("workspace_삭제_성공")
     void delete() {
-
         // given
         when(workspaceMapper.findById(WorkspaceFixture.ID)).thenReturn(Optional.of(WorkspaceFixture.workspace()));
-        when(workspaceMemberMapper.findByIdAndUserId(WorkspaceFixture.ID, WorkspaceFixture.USER_ID)).thenReturn(Optional.of(WorkspaceFixture.adminMember()));
 
         // when
         workspaceService.delete(WorkspaceFixture.ID, WorkspaceFixture.USER_ID);
@@ -180,10 +177,10 @@ class WorkspaceServiceTest {
     @Test
     @DisplayName("workspace_삭제_실패_권한없음")
     void deleteFailNotAdmin() {
-
         // given
         when(workspaceMapper.findById(WorkspaceFixture.ID)).thenReturn(Optional.of(WorkspaceFixture.workspace()));
-        when(workspaceMemberMapper.findByIdAndUserId(WorkspaceFixture.ID, WorkspaceFixture.USER_ID)).thenReturn(Optional.of(WorkspaceFixture.nonAdminMember()));
+        doThrow(new AccessDeniedException("관리자만 가능합니다."))
+                .when(permissionChecker).checkAdmin(WorkspaceFixture.ID, WorkspaceFixture.USER_ID);
 
         // when & then
         assertThatThrownBy(() -> workspaceService.delete(WorkspaceFixture.ID, WorkspaceFixture.USER_ID))
@@ -193,10 +190,10 @@ class WorkspaceServiceTest {
     @Test
     @DisplayName("workspace_삭제_실패_멤버아님")
     void deleteFailNotMember() {
-
         // given
         when(workspaceMapper.findById(WorkspaceFixture.ID)).thenReturn(Optional.of(WorkspaceFixture.workspace()));
-        when(workspaceMemberMapper.findByIdAndUserId(WorkspaceFixture.ID, WorkspaceFixture.USER_ID)).thenReturn(Optional.empty());
+        doThrow(new AccessDeniedException("워크스페이스 멤버가 아닙니다."))
+                .when(permissionChecker).checkAdmin(WorkspaceFixture.ID, WorkspaceFixture.USER_ID);
 
         // when & then
         assertThatThrownBy(() -> workspaceService.delete(WorkspaceFixture.ID, WorkspaceFixture.USER_ID))
