@@ -10,5 +10,5 @@ public interface UserMapper {
     Optional<User> findByEmail(String email);
 
     void insert(User user);
-    void delete(Long id);
+    void delete(Long userId);
 }

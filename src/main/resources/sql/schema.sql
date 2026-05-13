@@ -41,6 +41,7 @@ CREATE TABLE task (
     content      CLOB,
     status       VARCHAR2(20)  NOT NULL,
     priority     VARCHAR2(20)  NOT NULL,
+    category     VARCHAR2(100),
     due_date     DATE,
     workspace_id NUMBER        NOT NULL,
     assignee_id  NUMBER,

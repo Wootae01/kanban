@@ -30,7 +30,7 @@ public class UserService {
     }
 
     // 회원 탈퇴
-    public void withdraw(Long id) {
-        userMapper.delete(id);
+    public void withdraw(Long userId) {
+        userMapper.delete(userId);
     }
 }

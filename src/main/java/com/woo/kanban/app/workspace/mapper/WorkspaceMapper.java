@@ -15,10 +15,10 @@ public interface WorkspaceMapper {
 
     List<WorkspaceResponse> findWorkspacesByUserId(Long userId);
 
-    Optional<Workspace> findById(Long id);
+    Optional<Workspace> findById(Long workspaceId);
 
-    void update(@Param("id") Long id, @Param("name") String name);
+    void update(@Param("workspaceId") Long workspaceId, @Param("name") String name);
 
-    void delete(Long id);
+    void delete(Long workspaceId);
 
 }

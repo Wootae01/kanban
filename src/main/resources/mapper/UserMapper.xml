@@ -18,6 +18,6 @@
     </insert>
 
     <delete id="delete" parameterType="Long">
-        DELETE FROM USERS WHERE ID = #{id}
+        DELETE FROM USERS WHERE ID = #{userId}
     </delete>
 </mapper>

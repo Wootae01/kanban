@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.woo.kanban.app.task.mapper.TaskMapper">
+    
+    <resultMap id="taskDetailResponseMap" type="TaskDetailResponse">
+        <constructor>
+            <idArg column="id" javaType="Long"/>
+            <arg column="title" javaType="String"/>
+            <arg column="content" javaType="String"/>
+            <arg column="status" javaType="TaskStatus"/>
+            <arg column="priority" javaType="TaskPriority"/>
+            <arg column="assignee_name" javaType="String"/>
+            <arg column="due_date" javaType="java.time.LocalDate"/>
+            <arg column="category" javaType="String"/>
+        </constructor>
+    </resultMap>
+    
+    <insert id="insert" parameterType="Task">
+        <selectKey keyProperty="id" resultType="Long" order="BEFORE">
+            SELECT task_seq.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TASK(id, title, content, status, priority, category, due_date, workspace_id, assignee_id, created_by, created_at)
+        VALUES(#{id}, #{title}, #{content}, #{status}, #{priority}, #{category}, #{dueDate}, #{workspaceId}, #{assigneeId}, #{createdBy}, SYSDATE)
+    </insert>
+
+    <select id="findTasksByWorkspaceId" parameterType="Long" resultType="Task">
+        SELECT * FROM TASK WHERE workspace_id = #{workspaceId}
+    </select>
+
+    <select id="findTaskDetailById" parameterType="Long" resultMap="taskDetailResponseMap">
+        SELECT id, title, content, status, priority, u.name AS assignee_name, due_date, category
+        FROM TASK t
+        LEFT JOIN USERS u ON t.assignee_id = u.id
+        WHERE t.id = #{taskId}
+    </select>
+
+    <select id="findById" parameterType="Long" resultType="Task">
+        SELECT * FROM TASK WHERE id = #{taskId}
+    </select>
+
+    <select id="existById" parameterType="Long" resultType="boolean">
+        SELECT COUNT(*) FROM TASK WHERE id = #{taskId}
+    </select>
+
+    <update id="update">
+        UPDATE TASK SET
+            title = #{request.title},
+            content = #{request.content},
+            status = #{request.status},
+            priority = #{request.priority},
+            assignee_id = #{request.assigneeId},
+            due_date = #{request.dueDate},
+            category = #{request.category}
+        WHERE id = #{taskId}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE TASK SET status = #{status} WHERE id = #{taskId}
+    </update>
+
+    <update id="updateAssignee">
+        UPDATE TASK SET assignee_id = #{assigneeId} WHERE id = #{taskId}
+    </update>
+
+    <delete id="delete" parameterType="Long">
+        DELETE FROM TASK WHERE id = #{taskId}
+    </delete>
+
+</mapper>
