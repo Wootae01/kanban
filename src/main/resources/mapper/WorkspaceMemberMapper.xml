@@ -3,6 +3,13 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.woo.kanban.app.workspace.mapper.WorkspaceMemberMapper">
+    <resultMap id="memberResponseMap" type="MemberResponse">
+        <constructor>
+            <idArg column="user_id" javaType="Long"/>
+            <arg column="name" javaType="String"/>
+            <arg column="role" javaType="MemberRole"/>
+        </constructor>
+    </resultMap>
     <insert id="insert" parameterType="WorkspaceMember">
         <selectKey keyProperty="id" resultType="Long" order="BEFORE">
             SELECT workspace_member_seq.NEXTVAL FROM DUAL
@@ -16,4 +23,18 @@
         FROM WORKSPACE_MEMBER
         WHERE workspace_id = #{workspaceId} AND user_id = #{userId}
     </select>
+
+    <select id="findMembersById" resultMap="memberResponseMap">
+        SELECT user_id, u.name, role
+        FROM WORKSPACE_MEMBER wm
+        JOIN USERS u
+        ON wm.USER_ID = u.ID
+        WHERE wm.WORKSPACE_ID = #{workspaceId}
+    </select>
+
+    <delete id="deleteMember">
+        DELETE FROM WORKSPACE_MEMBER
+        WHERE WORKSPACE_ID = #{workspaceId}
+        AND USER_ID = #{memberId}
+    </delete>
 </mapper>

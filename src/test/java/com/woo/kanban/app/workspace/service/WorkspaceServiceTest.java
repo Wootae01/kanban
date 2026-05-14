@@ -124,7 +124,6 @@ class WorkspaceServiceTest {
     void updateSuccess() {
         // given
         WorkspaceUpdateRequest request = new WorkspaceUpdateRequest("newName");
-        when(workspaceMapper.findById(WorkspaceFixture.ID)).thenReturn(Optional.of(WorkspaceFixture.workspace()));
 
         // when
         workspaceService.update(WorkspaceFixture.ID, WorkspaceFixture.USER_ID, request);
@@ -138,7 +137,6 @@ class WorkspaceServiceTest {
     void updateFailNotAdmin() {
         // given
         WorkspaceUpdateRequest request = new WorkspaceUpdateRequest("testName");
-        when(workspaceMapper.findById(WorkspaceFixture.ID)).thenReturn(Optional.of(WorkspaceFixture.workspace()));
         doThrow(new AccessDeniedException("관리자만 가능합니다."))
                 .when(permissionChecker).checkAdmin(WorkspaceFixture.ID, WorkspaceFixture.USER_ID);
 
@@ -152,7 +150,6 @@ class WorkspaceServiceTest {
     void updateFailNotMember() {
         // given
         WorkspaceUpdateRequest request = new WorkspaceUpdateRequest("testName");
-        when(workspaceMapper.findById(WorkspaceFixture.ID)).thenReturn(Optional.of(WorkspaceFixture.workspace()));
         doThrow(new AccessDeniedException("워크스페이스 멤버가 아닙니다."))
                 .when(permissionChecker).checkAdmin(WorkspaceFixture.ID, WorkspaceFixture.USER_ID);
 
@@ -164,9 +161,6 @@ class WorkspaceServiceTest {
     @Test
     @DisplayName("workspace_삭제_성공")
     void delete() {
-        // given
-        when(workspaceMapper.findById(WorkspaceFixture.ID)).thenReturn(Optional.of(WorkspaceFixture.workspace()));
-
         // when
         workspaceService.delete(WorkspaceFixture.ID, WorkspaceFixture.USER_ID);
 
@@ -178,7 +172,6 @@ class WorkspaceServiceTest {
     @DisplayName("workspace_삭제_실패_권한없음")
     void deleteFailNotAdmin() {
         // given
-        when(workspaceMapper.findById(WorkspaceFixture.ID)).thenReturn(Optional.of(WorkspaceFixture.workspace()));
         doThrow(new AccessDeniedException("관리자만 가능합니다."))
                 .when(permissionChecker).checkAdmin(WorkspaceFixture.ID, WorkspaceFixture.USER_ID);
 
@@ -191,12 +184,80 @@ class WorkspaceServiceTest {
     @DisplayName("workspace_삭제_실패_멤버아님")
     void deleteFailNotMember() {
         // given
-        when(workspaceMapper.findById(WorkspaceFixture.ID)).thenReturn(Optional.of(WorkspaceFixture.workspace()));
         doThrow(new AccessDeniedException("워크스페이스 멤버가 아닙니다."))
                 .when(permissionChecker).checkAdmin(WorkspaceFixture.ID, WorkspaceFixture.USER_ID);
 
         // when & then
         assertThatThrownBy(() -> workspaceService.delete(WorkspaceFixture.ID, WorkspaceFixture.USER_ID))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    @DisplayName("workspace_멤버목록조회")
+    void getMemberList() {
+        // given
+        when(workspaceMemberMapper.findMembersById(WorkspaceFixture.ID)).thenReturn(List.of());
+
+        // when
+        workspaceService.getMemberList(WorkspaceFixture.ID, WorkspaceFixture.USER_ID);
+
+        // then
+        verify(permissionChecker).checkMember(WorkspaceFixture.ID, WorkspaceFixture.USER_ID);
+        verify(workspaceMemberMapper).findMembersById(WorkspaceFixture.ID);
+    }
+
+    @Test
+    @DisplayName("workspace_멤버목록조회_실패_멤버아님")
+    void getMemberListNotMember() {
+        // given
+        doThrow(new AccessDeniedException("워크스페이스 멤버가 아닙니다."))
+                .when(permissionChecker).checkMember(WorkspaceFixture.ID, WorkspaceFixture.USER_ID);
+
+        // when & then
+        assertThatThrownBy(() -> workspaceService.getMemberList(WorkspaceFixture.ID, WorkspaceFixture.USER_ID))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    @DisplayName("workspace_멤버삭제_성공")
+    void deleteMember() {
+
+        // given
+        Long memberId = 3L;
+
+        // when
+        workspaceService.deleteMember(WorkspaceFixture.ID, memberId, WorkspaceFixture.USER_ID);
+
+        // then
+        verify(permissionChecker).checkAdmin(WorkspaceFixture.ID, WorkspaceFixture.USER_ID);
+        verify(workspaceMemberMapper).deleteMember(WorkspaceFixture.ID, memberId);
+    }
+
+    @Test
+    @DisplayName("workspace_멤버삭제_실패_관리자아님")
+    void deleteMember_notAdmin() {
+
+        // given
+        Long memberId = 3L;
+        doThrow(new AccessDeniedException("관리자가 아닙니다."))
+                .when(permissionChecker).checkAdmin(WorkspaceFixture.ID, WorkspaceFixture.USER_ID);
+
+
+        // when && then
+        assertThatThrownBy(() -> workspaceService.deleteMember(WorkspaceFixture.ID, memberId, WorkspaceFixture.USER_ID))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    @DisplayName("workspace_멤버삭제_실패_멤버아님")
+    void deleteMember_notMember() {
+        // given
+        Long memberId = 3L;
+        doThrow(new AccessDeniedException("워크스페이스 멤버가 아닙니다."))
+                .when(permissionChecker).checkAdmin(WorkspaceFixture.ID, WorkspaceFixture.USER_ID);
+
+        // when & then
+        assertThatThrownBy(() -> workspaceService.deleteMember(WorkspaceFixture.ID, memberId, WorkspaceFixture.USER_ID))
                 .isInstanceOf(AccessDeniedException.class);
     }
 

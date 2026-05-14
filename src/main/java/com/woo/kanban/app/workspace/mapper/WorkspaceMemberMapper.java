@@ -1,9 +1,11 @@
 package com.woo.kanban.app.workspace.mapper;
 
 import com.woo.kanban.app.workspace.WorkspaceMember;
+import com.woo.kanban.app.workspace.dto.MemberResponse;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 @Mapper
@@ -13,5 +15,9 @@ public interface WorkspaceMemberMapper {
 
     Optional<WorkspaceMember> findByIdAndUserId(@Param("workspaceId") Long workspaceId,
                                                 @Param("userId") Long userId);
+
+    List<MemberResponse> findMembersById(Long workspaceId);
+
+    void deleteMember(@Param("workspaceId") Long workspaceId, @Param("memberId") Long memberId);
 
 }

@@ -3,10 +3,7 @@ package com.woo.kanban.app.workspace.service;
 import com.woo.kanban.app.workspace.MemberRole;
 import com.woo.kanban.app.workspace.Workspace;
 import com.woo.kanban.app.workspace.WorkspaceMember;
-import com.woo.kanban.app.workspace.dto.WorkspaceCreateRequest;
-import com.woo.kanban.app.workspace.dto.WorkspaceDetailResponse;
-import com.woo.kanban.app.workspace.dto.WorkspaceResponse;
-import com.woo.kanban.app.workspace.dto.WorkspaceUpdateRequest;
+import com.woo.kanban.app.workspace.dto.*;
 import com.woo.kanban.app.workspace.mapper.WorkspaceMapper;
 import com.woo.kanban.app.workspace.mapper.WorkspaceMemberMapper;
 import lombok.RequiredArgsConstructor;
@@ -56,20 +53,30 @@ public class WorkspaceService {
 
     }
 
+    // workspace 멤버 조회
+    public List<MemberResponse> getMemberList(Long workspaceId, Long userId) {
+        permissionChecker.checkMember(workspaceId, userId);
+        return workspaceMemberMapper.findMembersById(workspaceId);
+    }
+
     // update
     @Transactional
     public void update(Long workspaceId, Long userId, WorkspaceUpdateRequest request) {
-        workspaceMapper.findById(workspaceId)
-                .orElseThrow(() -> new NoSuchElementException("workspace가 존재하지 않습니다."));
         permissionChecker.checkAdmin(workspaceId, userId);
         workspaceMapper.update(workspaceId, request.name());
     }
 
+    // workspace 삭제
     @Transactional
     public void delete(Long workspaceId, Long userId) {
-        workspaceMapper.findById(workspaceId)
-                .orElseThrow(() -> new NoSuchElementException("workspace가 존재하지 않습니다."));
         permissionChecker.checkAdmin(workspaceId, userId);
         workspaceMapper.delete(workspaceId);
+    }
+
+    // workspace member 삭제
+    @Transactional
+    public void deleteMember(Long workspaceId, Long memberId, Long userId) {
+        permissionChecker.checkAdmin(workspaceId, userId);
+        workspaceMemberMapper.deleteMember(workspaceId, memberId);
     }
 }

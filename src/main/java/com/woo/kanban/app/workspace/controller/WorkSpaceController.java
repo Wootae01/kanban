@@ -1,10 +1,7 @@
 package com.woo.kanban.app.workspace.controller;
 
 import com.woo.kanban.app.user.CustomUserDetails;
-import com.woo.kanban.app.workspace.dto.WorkspaceCreateRequest;
-import com.woo.kanban.app.workspace.dto.WorkspaceDetailResponse;
-import com.woo.kanban.app.workspace.dto.WorkspaceResponse;
-import com.woo.kanban.app.workspace.dto.WorkspaceUpdateRequest;
+import com.woo.kanban.app.workspace.dto.*;
 import com.woo.kanban.app.workspace.service.WorkspaceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -60,6 +57,25 @@ public class WorkSpaceController {
                                                 @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         workspaceService.delete(id, userDetails.getId());
+        return ResponseEntity.ok().build();
+    }
+
+    // workspace 멤버 조회
+    @GetMapping("/{id}/members")
+    public ResponseEntity<List<MemberResponse>> getMemberList(@PathVariable Long id,
+                                                              @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        List<MemberResponse> result = workspaceService.getMemberList(id, userDetails.getId());
+
+        return ResponseEntity.ok(result);
+    }
+
+    @DeleteMapping("/{id}/members/{memberId}")
+    public ResponseEntity<Void> deleteMember(@PathVariable Long id,
+                                             @PathVariable Long memberId,
+                                             @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        workspaceService.deleteMember(id, memberId, userDetails.getId());
         return ResponseEntity.ok().build();
     }
 

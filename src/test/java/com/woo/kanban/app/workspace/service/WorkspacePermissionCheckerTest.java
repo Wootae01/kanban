@@ -1,8 +1,10 @@
 package com.woo.kanban.app.workspace.service;
 
 import com.woo.kanban.app.workspace.MemberRole;
+import com.woo.kanban.app.workspace.Workspace;
 import com.woo.kanban.app.workspace.WorkspaceMember;
 import com.woo.kanban.app.workspace.mapper.WorkspaceMemberMapper;
+import com.woo.kanban.app.workspace.mapper.WorkspaceMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -23,6 +26,9 @@ class WorkspacePermissionCheckerTest {
 
     @InjectMocks
     WorkspacePermissionChecker permissionChecker;
+
+    @Mock
+    WorkspaceMapper workspaceMapper;
 
     @Mock
     WorkspaceMemberMapper workspaceMemberMapper;
@@ -38,6 +44,7 @@ class WorkspacePermissionCheckerTest {
         @DisplayName("성공")
         void success() {
             // given
+            when(workspaceMapper.findById(WORKSPACE_ID)).thenReturn(Optional.of(new Workspace()));
             when(workspaceMemberMapper.findByIdAndUserId(WORKSPACE_ID, USER_ID))
                     .thenReturn(Optional.of(new WorkspaceMember()));
 
@@ -47,9 +54,21 @@ class WorkspacePermissionCheckerTest {
         }
 
         @Test
+        @DisplayName("실패 - workspace 없음")
+        void workspaceNotFound() {
+            // given
+            when(workspaceMapper.findById(WORKSPACE_ID)).thenReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> permissionChecker.checkMember(WORKSPACE_ID, USER_ID))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @Test
         @DisplayName("실패 - 멤버 아님")
         void notMember() {
             // given
+            when(workspaceMapper.findById(WORKSPACE_ID)).thenReturn(Optional.of(new Workspace()));
             when(workspaceMemberMapper.findByIdAndUserId(WORKSPACE_ID, USER_ID))
                     .thenReturn(Optional.empty());
 
@@ -70,6 +89,7 @@ class WorkspacePermissionCheckerTest {
             // given
             WorkspaceMember admin = new WorkspaceMember();
             admin.setRole(MemberRole.ADMIN);
+            when(workspaceMapper.findById(WORKSPACE_ID)).thenReturn(Optional.of(new Workspace()));
             when(workspaceMemberMapper.findByIdAndUserId(WORKSPACE_ID, USER_ID))
                     .thenReturn(Optional.of(admin));
 
@@ -79,9 +99,21 @@ class WorkspacePermissionCheckerTest {
         }
 
         @Test
+        @DisplayName("실패 - workspace 없음")
+        void workspaceNotFound() {
+            // given
+            when(workspaceMapper.findById(WORKSPACE_ID)).thenReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> permissionChecker.checkAdmin(WORKSPACE_ID, USER_ID))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @Test
         @DisplayName("실패 - 멤버 아님")
         void notMember() {
             // given
+            when(workspaceMapper.findById(WORKSPACE_ID)).thenReturn(Optional.of(new Workspace()));
             when(workspaceMemberMapper.findByIdAndUserId(WORKSPACE_ID, USER_ID))
                     .thenReturn(Optional.empty());
 
@@ -97,6 +129,7 @@ class WorkspacePermissionCheckerTest {
             // given
             WorkspaceMember member = new WorkspaceMember();
             member.setRole(MemberRole.MEMBER);
+            when(workspaceMapper.findById(WORKSPACE_ID)).thenReturn(Optional.of(new Workspace()));
             when(workspaceMemberMapper.findByIdAndUserId(WORKSPACE_ID, USER_ID))
                     .thenReturn(Optional.of(member));
 
