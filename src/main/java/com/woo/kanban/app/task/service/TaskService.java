@@ -32,9 +32,7 @@ public class TaskService {
     // task 목록 조회 - 멤버면 누구나
     public List<TaskResponse> findTasksByWorkspaceId(Long workspaceId, Long userId) {
         permissionChecker.checkMember(workspaceId, userId);
-        return taskMapper.findTasksByWorkspaceId(workspaceId).stream()
-                .map(TaskResponse::from)
-                .toList();
+        return taskMapper.findTasksByWorkspaceId(workspaceId);
     }
 
     // task 상세 조회 - 멤버면 누구나

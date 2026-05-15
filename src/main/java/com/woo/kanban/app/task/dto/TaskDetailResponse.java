@@ -13,6 +13,6 @@ public record TaskDetailResponse (
         TaskPriority priority,
         String assigneeName,
         LocalDate dueDate,
-        String category
+        String categoryName
 ) {
 }

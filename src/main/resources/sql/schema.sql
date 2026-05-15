@@ -5,6 +5,7 @@ CREATE SEQUENCE user_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE workspace_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE workspace_member_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE task_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE category_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE notification_seq START WITH 1 INCREMENT BY 1;
 
 -- =====================
@@ -35,13 +36,21 @@ CREATE TABLE workspace_member (
     CONSTRAINT fk_wm_user FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
+CREATE TABLE category (
+    id           NUMBER PRIMARY KEY,
+    workspace_id NUMBER        NOT NULL,
+    name         VARCHAR2(100) NOT NULL,
+    created_at   DATE DEFAULT SYSDATE,
+    CONSTRAINT fk_category_workspace FOREIGN KEY (workspace_id) REFERENCES workspace (id)
+);
+
 CREATE TABLE task (
     id           NUMBER PRIMARY KEY,
     title        VARCHAR2(255) NOT NULL,
     content      CLOB,
     status       VARCHAR2(20)  NOT NULL,
     priority     VARCHAR2(20)  NOT NULL,
-    category     VARCHAR2(100),
+    category_id  NUMBER,
     due_date     DATE,
     workspace_id NUMBER        NOT NULL,
     assignee_id  NUMBER,
@@ -49,7 +58,8 @@ CREATE TABLE task (
     created_at   DATE DEFAULT SYSDATE,
     CONSTRAINT fk_task_workspace FOREIGN KEY (workspace_id) REFERENCES workspace (id),
     CONSTRAINT fk_task_assignee FOREIGN KEY (assignee_id) REFERENCES users (id),
-    CONSTRAINT fk_task_creator FOREIGN KEY (created_by) REFERENCES users (id)
+    CONSTRAINT fk_task_creator FOREIGN KEY (created_by) REFERENCES users (id),
+    CONSTRAINT fk_task_category FOREIGN KEY (category_id) REFERENCES category (id) ON DELETE SET NULL
 );
 
 CREATE TABLE notification (

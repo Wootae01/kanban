@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.woo.kanban.app.category.mapper.CategoryMapper">
+
+    <insert id="insert" parameterType="Category">
+        <selectKey keyProperty="id" resultType="Long" order="BEFORE">
+            SELECT category_seq.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO CATEGORY(id, workspace_id, name, created_at)
+        VALUES(#{id}, #{workspaceId}, #{name}, SYSDATE)
+    </insert>
+
+    <select id="existsByNameAndWorkspaceId" resultType="boolean">
+        SELECT COUNT(*) FROM CATEGORY
+        WHERE workspace_id = #{workspaceId} AND name = #{name}
+    </select>
+
+    <select id="findAll" resultType="Category" parameterType="Long">
+        SELECT * FROM CATEGORY
+        WHERE WORKSPACE_ID = #{workspaceId}
+    </select>
+
+    <delete id="delete">
+        DELETE FROM CATEGORY
+        WHERE ID = #{categoryId}
+    </delete>
+
+</mapper>

@@ -51,7 +51,7 @@ class TaskServiceTest {
             TaskCreateRequest request = new TaskCreateRequest(
                     "title", "content",
                     TaskStatus.TODO, TaskPriority.LOW,
-                    LocalDate.now(), 1L);
+                    LocalDate.now(), 1L, null);
 
             // when
             taskService.create(request, 10L, 2L);
@@ -71,7 +71,7 @@ class TaskServiceTest {
             TaskCreateRequest request = new TaskCreateRequest(
                     "title", "content",
                     TaskStatus.TODO, TaskPriority.LOW,
-                    LocalDate.now(), 1L);
+                    LocalDate.now(), 1L, null);
 
             doThrow(new AccessDeniedException("워크스페이스 멤버가 아닙니다."))
                     .when(permissionChecker).checkMember(10L, 2L);
@@ -91,16 +91,12 @@ class TaskServiceTest {
         @DisplayName("성공")
         void success() {
             // given
-            Task task = new Task();
-            task.setId(1L);
-            task.setTitle("title");
-            task.setContent("content");
-            task.setStatus(TaskStatus.TODO);
-            task.setPriority(TaskPriority.LOW);
-            task.setWorkspaceId(10L);
-            task.setCreatedBy(2L);
+            TaskResponse taskResponse = new TaskResponse(
+                    1L, "title", null, "content",
+                    TaskStatus.TODO, TaskPriority.LOW,
+                    null, null, 2L);
 
-            when(taskMapper.findTasksByWorkspaceId(10L)).thenReturn(List.of(task));
+            when(taskMapper.findTasksByWorkspaceId(10L)).thenReturn(List.of(taskResponse));
 
             // when
             List<TaskResponse> result = taskService.findTasksByWorkspaceId(10L, 2L);
@@ -137,7 +133,7 @@ class TaskServiceTest {
             Long taskId = 1L;
             TaskDetailResponse data = new TaskDetailResponse(
                     1L, "title", "content",
-                    TaskStatus.TODO, TaskPriority.HIGH, "name", LocalDate.now(), "category");
+                    TaskStatus.TODO, TaskPriority.HIGH, "name", LocalDate.now(), "백엔드");
 
             when(taskMapper.findTaskDetailById(taskId)).thenReturn(Optional.of(data));
 
@@ -186,7 +182,7 @@ class TaskServiceTest {
             Long taskId = 1L;
             Long userId = 2L;
             TaskUpdateRequest dto = new TaskUpdateRequest("title", "content",
-                    TaskStatus.TODO, TaskPriority.HIGH, 1L, LocalDate.now(), "category");
+                    TaskStatus.TODO, TaskPriority.HIGH, 1L, LocalDate.now(), null);
 
             when(taskMapper.existById(taskId)).thenReturn(true);
 

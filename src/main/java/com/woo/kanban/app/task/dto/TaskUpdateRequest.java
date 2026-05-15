@@ -14,6 +14,6 @@ public record TaskUpdateRequest(
         @NotNull TaskPriority priority,
         Long assigneeId,
         LocalDate dueDate,
-        String category
+        Long categoryId
 ) {
 }

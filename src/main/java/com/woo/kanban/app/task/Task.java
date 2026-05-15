@@ -17,7 +17,7 @@ public class Task {
     private String content;
     private TaskStatus status;
     private TaskPriority priority;
-    private String category;
+    private Long categoryId;
     private LocalDate dueDate;
     private Long assigneeId;
     private Long createdBy;

@@ -4,6 +4,20 @@
 
 <mapper namespace="com.woo.kanban.app.task.mapper.TaskMapper">
     
+    <resultMap id="taskResponseMap" type="TaskResponse">
+        <constructor>
+            <idArg column="id" javaType="Long"/>
+            <arg column="title" javaType="String"/>
+            <arg column="category_name" javaType="String"/>
+            <arg column="content" javaType="String"/>
+            <arg column="status" javaType="TaskStatus"/>
+            <arg column="priority" javaType="TaskPriority"/>
+            <arg column="due_date" javaType="java.time.LocalDate"/>
+            <arg column="assignee_id" javaType="Long"/>
+            <arg column="created_by" javaType="Long"/>
+        </constructor>
+    </resultMap>
+
     <resultMap id="taskDetailResponseMap" type="TaskDetailResponse">
         <constructor>
             <idArg column="id" javaType="Long"/>
@@ -13,26 +27,30 @@
             <arg column="priority" javaType="TaskPriority"/>
             <arg column="assignee_name" javaType="String"/>
             <arg column="due_date" javaType="java.time.LocalDate"/>
-            <arg column="category" javaType="String"/>
+            <arg column="category_name" javaType="String"/>
         </constructor>
     </resultMap>
-    
+
     <insert id="insert" parameterType="Task">
         <selectKey keyProperty="id" resultType="Long" order="BEFORE">
             SELECT task_seq.NEXTVAL FROM DUAL
         </selectKey>
-        INSERT INTO TASK(id, title, content, status, priority, category, due_date, workspace_id, assignee_id, created_by, created_at)
-        VALUES(#{id}, #{title}, #{content}, #{status}, #{priority}, #{category}, #{dueDate}, #{workspaceId}, #{assigneeId}, #{createdBy}, SYSDATE)
+        INSERT INTO TASK(id, title, content, status, priority, category_id, due_date, workspace_id, assignee_id, created_by, created_at)
+        VALUES(#{id}, #{title}, #{content}, #{status}, #{priority}, #{categoryId}, #{dueDate}, #{workspaceId}, #{assigneeId}, #{createdBy}, SYSDATE)
     </insert>
 
-    <select id="findTasksByWorkspaceId" parameterType="Long" resultType="Task">
-        SELECT * FROM TASK WHERE workspace_id = #{workspaceId}
+    <select id="findTasksByWorkspaceId" parameterType="Long" resultMap="taskResponseMap">
+        SELECT t.id, t.title, c.name AS category_name, t.content, t.status, t.priority, t.due_date, t.assignee_id, t.created_by
+        FROM TASK t
+        LEFT JOIN CATEGORY c ON t.category_id = c.id
+        WHERE t.workspace_id = #{workspaceId}
     </select>
 
     <select id="findTaskDetailById" parameterType="Long" resultMap="taskDetailResponseMap">
-        SELECT id, title, content, status, priority, u.name AS assignee_name, due_date, category
+        SELECT t.id, t.title, t.content, t.status, t.priority, u.name AS assignee_name, t.due_date, c.name AS category_name
         FROM TASK t
         LEFT JOIN USERS u ON t.assignee_id = u.id
+        LEFT JOIN CATEGORY c ON t.category_id = c.id
         WHERE t.id = #{taskId}
     </select>
 
@@ -52,7 +70,7 @@
             priority = #{request.priority},
             assignee_id = #{request.assigneeId},
             due_date = #{request.dueDate},
-            category = #{request.category}
+            category_id = #{request.categoryId}
         WHERE id = #{taskId}
     </update>
 

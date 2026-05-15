@@ -14,7 +14,8 @@ public record TaskCreateRequest(
         @NotNull TaskStatus status,
         @NotNull TaskPriority priority,
         LocalDate dueDate,
-        Long assigneeId
+        Long assigneeId,
+        Long categoryId
 ) {
     public Task toEntity(Long workspaceId, Long createdBy) {
         Task task = new Task();
@@ -26,6 +27,7 @@ public record TaskCreateRequest(
         task.setWorkspaceId(workspaceId);
         task.setAssigneeId(this.assigneeId());
         task.setCreatedBy(createdBy);
+        task.setCategoryId(categoryId);
         return task;
     }
 }

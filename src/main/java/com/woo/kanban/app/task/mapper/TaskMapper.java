@@ -3,6 +3,7 @@ package com.woo.kanban.app.task.mapper;
 import com.woo.kanban.app.task.Task;
 import com.woo.kanban.app.task.TaskStatus;
 import com.woo.kanban.app.task.dto.TaskDetailResponse;
+import com.woo.kanban.app.task.dto.TaskResponse;
 import com.woo.kanban.app.task.dto.TaskUpdateRequest;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -14,7 +15,7 @@ import java.util.Optional;
 public interface TaskMapper {
     void insert(Task task);
 
-    List<Task> findTasksByWorkspaceId(Long workspaceId);
+    List<TaskResponse> findTasksByWorkspaceId(Long workspaceId);
 
     Optional<TaskDetailResponse> findTaskDetailById(Long taskId);
 
