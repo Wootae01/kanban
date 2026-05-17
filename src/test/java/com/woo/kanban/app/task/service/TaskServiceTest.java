@@ -1,6 +1,5 @@
 package com.woo.kanban.app.task.service;
 
-import com.woo.kanban.app.task.Task;
 import com.woo.kanban.app.task.TaskPriority;
 import com.woo.kanban.app.task.TaskStatus;
 import com.woo.kanban.app.task.dto.TaskCreateRequest;

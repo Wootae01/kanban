@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.woo.kanban.app.notification.mapper.NotificationMapper">
+
+    <resultMap id="notificationResponseMap" type="NotificationResponse">
+        <constructor>
+            <idArg column="id" javaType="Long"/>
+            <arg column="title" javaType="String"/>
+            <arg column="message" javaType="String"/>
+            <arg column="is_read" javaType="boolean"/>
+            <arg column="created_at" javaType="java.time.LocalDateTime"/>
+        </constructor>
+    </resultMap>
+
+    <insert id="insert">
+        INSERT INTO NOTIFICATION(id, user_id, title, message, is_read, created_at)
+        VALUES(NOTIFICATION_SEQ.NEXTVAL, #{userId}, #{title}, #{message}, 0, SYSDATE)
+    </insert>
+
+    <select id="findByUserId" parameterType="Long" resultMap="notificationResponseMap">
+        SELECT id, title, message, is_read, created_at
+        FROM notification
+        WHERE user_id = #{userId}
+        ORDER BY created_at DESC
+    </select>
+
+    <update id="updateIsRead">
+        UPDATE NOTIFICATION SET IS_READ = 1
+        WHERE ID = #{notificationId} AND USER_ID = #{userId}
+    </update>
+
+    <update id="updateAllIsRead">
+        UPDATE NOTIFICATION SET IS_READ = 1
+        WHERE USER_ID = #{userId}
+    </update>
+
+</mapper>
